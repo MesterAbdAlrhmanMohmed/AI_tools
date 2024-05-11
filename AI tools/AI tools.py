@@ -219,6 +219,7 @@ class tab4(qt.QWidget):
         self.إظهار3=qt.QLabel("النص المستخرَج")
         self.النص=qt.QLineEdit()
         self.النص.setAccessibleName("النص المستخرَج")
+        self.النص.setReadOnly(True)
         self.نسخ=qt.QPushButton("نسخ النص")
         self.نسخ.setDefault(True)
         self.نسخ.clicked.connect(self.c)
