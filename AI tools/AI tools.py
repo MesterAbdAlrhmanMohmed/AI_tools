@@ -237,6 +237,9 @@ class tab4(qt.QWidget):
         lang=dic.languages[self.اللغة.currentText()]
         recognizer=sr.Recognizer()    
         audio_file=(self.مسار.text())    
+        if not self.مسار.text():
+            qt.QMessageBox.warning(self,"تنبيه","لم يتم تحديد ملف للتعرف عليه")
+            return
         with sr.AudioFile(audio_file) as source:
             audio_data=recognizer.record(source)        
             try:
