@@ -209,6 +209,7 @@ class tab4(qt.QWidget):
         self.إظهار1=qt.QLabel("مسار الملف")
         self.مسار=qt.QLineEdit()
         self.مسار.setAccessibleName("مسار الملف")
+        self.مسار.setReadOnly(True)
         self.إظهار2=qt.QLabel("إختيار لغة المقطع الصوتي")
         self.اللغة=qt.QComboBox()
         self.اللغة.setAccessibleName("إختيار لغة المقطع الصوتي")
