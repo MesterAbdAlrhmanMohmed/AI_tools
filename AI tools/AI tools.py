@@ -213,7 +213,7 @@ class tab4(qt.QWidget):
         self.اللغة=qt.QComboBox()
         self.اللغة.setAccessibleName("إختيار لغة المقطع الصوتي")
         self.اللغة.addItems(dic.languages.keys())
-        self.إستخراج=qt.QPushButton("البدء")
+        self.إستخراج=qt.QPushButton("بدء الاستخراج")
         self.إستخراج.setDefault(True)
         self.إستخراج.clicked.connect(self.r)
         self.إظهار3=qt.QLabel("النص المستخرَج")
@@ -241,10 +241,13 @@ class tab4(qt.QWidget):
         if not self.مسار.text():
             qt.QMessageBox.warning(self,"تنبيه","لم يتم تحديد ملف للتعرف عليه")
             return
+        if not audio_file.endswith(".wav"):
+            qt.QMessageBox.warning(self, "تنبيه", "يجب أن يكون الملف بامتداد .wav")
+            return
         with sr.AudioFile(audio_file) as source:
             audio_data=recognizer.record(source)        
             try:
-                text=recognizer.recognize_google(audio_data, language=lang)
+                text=recognizer.recognize_google(audio_data,language=lang)
                 self.النص.setText(text)
             except sr.UnknownValueError:
                 qt.QMessageBox.warning(self, "تنبيه", "حدث خطأ، ربما المقطع فارغ أو اللغة غير صحيحة أو لم يتم التعرف بشكل جيد على المقطع")
@@ -285,7 +288,7 @@ class main (qt.QMainWindow):
     def about(self):
         about.dialog(self).exec()        
     def importint(self):
-        qt.QMessageBox.warning(self,"تنبيه هام","عند الضغت على زر الإرسال وزر بدء التحدث, يرجى تجنب التحرك أبدا داخل الكمبيوتر حتى يأتي الرد, لأن التحرك سيعطل البرنامج أثناء تحميله للنتائج")
+        qt.QMessageBox.warning(self,"تنبيه هام","عند الضغت على زر الإرسال وزر بدء التحدث وزر بدء إستخراج النص, يرجى تجنب التحرك أبدا داخل الكمبيوتر حتى يأتي الرد, لأن التحرك سيعطل البرنامج أثناء تحميله للنتائج")
 app=qt.QApplication([])
 app.setStyle('fusion')
 w=main()        
