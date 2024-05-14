@@ -5,7 +5,7 @@ from PyQt6.QtMultimedia import QMediaPlayer,QAudioOutput
 import gtts,os,langdetect,pyperclip,PIL.Image,about,dic,winsound,time
 import speech_recognition as sr
 import google.generativeai as genai
-genai.configure(api_key="AIzaSyCTr5HfWhL-79JEXsUMjbnRdSF97IVAic0")
+genai.configure(api_key="")
 model=genai.GenerativeModel('gemini-pro')
 response=model.start_chat()
 if not os.path.exists("data"):
