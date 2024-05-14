@@ -5,7 +5,7 @@ from PyQt6.QtMultimedia import QMediaPlayer,QAudioOutput
 import gtts,os,langdetect,pyperclip,PIL.Image,about,dic,winsound,time
 import speech_recognition as sr
 import google.generativeai as genai
-genai.configure(api_key="")
+genai.configure(api_key="AIzaSyCTr5HfWhL-79JEXsUMjbnRdSF97IVAic0")
 model=genai.GenerativeModel('gemini-pro')
 response=model.start_chat()
 if not os.path.exists("data"):
@@ -149,7 +149,7 @@ class tab2(qt.QWidget):
         file=qt.QFileDialog()
         file.setAcceptMode(qt.QFileDialog.AcceptMode.AcceptOpen)
         if file.exec()==qt.QFileDialog.DialogCode.Accepted:
-            self.مسار.setText(file.selectedFiles()[0])                                 
+            self.مسار.setText(file.selectedFiles()[0])
 class tab3(qt.QWidget):
     def __init__(self):
         super().__init__()                    
@@ -212,8 +212,10 @@ class tab4(qt.QWidget):
         self.مسار.setReadOnly(True)
         self.إظهار2=qt.QLabel("إختيار لغة المقطع الصوتي")
         self.اللغة=qt.QComboBox()
-        self.اللغة.setAccessibleName("إختيار لغة المقطع الصوتي")
-        self.اللغة.addItems(dic.languages.keys())
+        self.اللغة.setAccessibleName("إختيار لغة المقطع الصوتي")        
+        self.اللغة.addItem("الإنجليزية")
+        self.اللغة.addItem("العربية")
+        self.اللغة.addItem("تحديد لغة مخصصة")
         self.إستخراج=qt.QPushButton("بدء الاستخراج")
         self.إستخراج.setDefault(True)
         self.إستخراج.clicked.connect(self.r)
@@ -224,19 +226,24 @@ class tab4(qt.QWidget):
         self.نسخ=qt.QPushButton("نسخ النص")
         self.نسخ.setDefault(True)
         self.نسخ.clicked.connect(self.c)
+        self.إظهار4=qt.QLabel("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
+        self.مخصص=qt.QLineEdit()        
+        self.مخصص.setAccessibleName("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
         l=qt.QVBoxLayout()
         l.addWidget(self.فتح)
         l.addWidget(self.إظهار1)
         l.addWidget(self.مسار)
         l.addWidget(self.إظهار2)
         l.addWidget(self.اللغة)
+        l.addWidget(self.إظهار4)
+        l.addWidget(self.مخصص)
         l.addWidget(self.إستخراج)
         l.addWidget(self.إظهار3)
         l.addWidget(self.النص)
         l.addWidget(self.نسخ)
         self.setLayout(l)    
-    def r(self):        
-        lang=dic.languages[self.اللغة.currentText()]
+    def r(self):                
+        اللغات=self.اللغة.currentIndex()
         recognizer=sr.Recognizer()    
         audio_file=(self.مسار.text())    
         if not self.مسار.text():
@@ -244,15 +251,28 @@ class tab4(qt.QWidget):
             return
         if not audio_file.endswith(".wav"):
             qt.QMessageBox.warning(self, "تنبيه", "يجب أن يكون الملف بامتداد .wav")
-            return
+            return        
         with sr.AudioFile(audio_file) as source:
             audio_data=recognizer.record(source)        
             try:
-                text=recognizer.recognize_google(audio_data,language=lang)
-                self.النص.setText(text)
+                if اللغات==0:
+                    text=recognizer.recognize_wit(audio_data,"")
+                    self.النص.setText(text)
+                if اللغات==1:
+                    text=recognizer.recognize_wit(audio_data,"")
+                    self.النص.setText(text)                                    
+                if اللغات==2:                    
+                    try:
+                        if not self.مخصص.text():        
+                            qt.QMessageBox.warning(self,"تنبيه","يرجى إدخال رمز اللغة المطلوب")                        
+                            return
+                        text=recognizer.recognize_wit(audio_data,self.مخصص.text())
+                        self.النص.setText(text)                                                        
+                    except:
+                        qt.QMessageBox.warning(self,"تنبيه","حدثت مشكلة, ربما رمز اللغة غير صحيح, أعد المحاولة")
             except sr.UnknownValueError:
                 qt.QMessageBox.warning(self, "تنبيه", "حدث خطأ، ربما المقطع فارغ أو اللغة غير صحيحة أو لم يتم التعرف بشكل جيد على المقطع")
-            except sr.RequestError as e:
+            except sr.RequestError as e:                
                 qt.QMessageBox.warning(self, "تنبيه", "فشلت عملية استخراج النص، ربما امتداد الملف غير مدعوم أو هناك مشكلة في الإنترنت")    
         self.النص.setFocus()
     def c(self):
