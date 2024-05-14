@@ -2,7 +2,7 @@ from PyQt6 import QtWidgets as qt
 from PyQt6 import QtGui as qt1
 from PyQt6 import QtCore as qt2
 from PyQt6.QtMultimedia import QMediaPlayer,QAudioOutput
-import gtts,os,langdetect,pyperclip,PIL.Image,about,dic,winsound,time
+import gtts,os,langdetect,pyperclip,PIL.Image,about,dic,winsound,time,webbrowser
 import speech_recognition as sr
 import google.generativeai as genai
 genai.configure(api_key="")
@@ -229,6 +229,9 @@ class tab4(qt.QWidget):
         self.إظهار4=qt.QLabel("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
         self.مخصص=qt.QLineEdit()        
         self.مخصص.setAccessibleName("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
+        self.wit=qt.QPushButton("الذهاب الى موقع wit.ai")
+        self.wit.setDefault(True)
+        self.wit.clicked.connect(self.wit_ai)
         l=qt.QVBoxLayout()
         l.addWidget(self.فتح)
         l.addWidget(self.إظهار1)
@@ -237,11 +240,14 @@ class tab4(qt.QWidget):
         l.addWidget(self.اللغة)
         l.addWidget(self.إظهار4)
         l.addWidget(self.مخصص)
+        l.addWidget(self.wit)
         l.addWidget(self.إستخراج)
         l.addWidget(self.إظهار3)
         l.addWidget(self.النص)
         l.addWidget(self.نسخ)
         self.setLayout(l)    
+    def wit_ai(self):                                                
+        webbrowser.open("wit.ai")
     def r(self):                
         اللغات=self.اللغة.currentIndex()
         recognizer=sr.Recognizer()    
@@ -261,7 +267,7 @@ class tab4(qt.QWidget):
                 if اللغات==1:
                     text=recognizer.recognize_wit(audio_data,"")
                     self.النص.setText(text)                                    
-                if اللغات==2:                    
+                if اللغات==2:                                        
                     try:
                         if not self.مخصص.text():        
                             qt.QMessageBox.warning(self,"تنبيه","يرجى إدخال رمز اللغة المطلوب")                        
@@ -312,6 +318,6 @@ class main (qt.QMainWindow):
         qt.QMessageBox.warning(self,"تنبيه هام","عند الضغت على زر الإرسال وزر بدء التحدث وزر بدء إستخراج النص, يرجى تجنب التحرك أبدا داخل الكمبيوتر حتى يأتي الرد, لأن التحرك سيعطل البرنامج أثناء تحميله للنتائج")
 app=qt.QApplication([])
 app.setStyle('fusion')
-w=main()        
+w=main()
 w.show()
 app.exec()
