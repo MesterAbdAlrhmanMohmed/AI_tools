@@ -2,7 +2,7 @@ from PyQt6 import QtWidgets as qt
 from PyQt6 import QtGui as qt1
 from PyQt6 import QtCore as qt2
 from PyQt6.QtMultimedia import QMediaPlayer,QAudioOutput
-import gtts,os,langdetect,pyperclip,PIL.Image,about,dic,winsound,time,webbrowser,soundfile
+import gtts,os,langdetect,pyperclip,PIL.Image,about,dic,winsound,time,webbrowser
 import speech_recognition as sr
 import google.generativeai as genai
 genai.configure(api_key="")
@@ -32,21 +32,21 @@ class tab1(qt.QWidget):
         self.m=QMediaPlayer()
         self.w=QAudioOutput()
         self.m.setAudioOutput(self.w)
-        self.إظهار = qt.QLabel("إسأل سؤالا")
-        self.الكتابة = qt.QLineEdit()
+        self.إظهار=qt.QLabel("إسأل سؤالا")
+        self.الكتابة=qt.QLineEdit()
         self.الكتابة.setAccessibleName("إسأل سؤالا")
-        self.إرسال = qt.QPushButton("إرسال")
+        self.إرسال=qt.QPushButton("إرسال")
         self.إرسال.setDefault(True)
         self.إرسال.clicked.connect(self.main)
-        self.الردود = qt.QComboBox()
-        self.نسخ_الرد = qt.QPushButton("نسخ تلك الفقرة")
+        self.الردود=qt.QComboBox()
+        self.نسخ_الرد=qt.QPushButton("نسخ تلك الفقرة")
         self.نسخ_الرد.setDefault(True)
         self.نسخ_الرد.clicked.connect(self.copy)
-        self.نسخ_الكل = qt.QPushButton("نسخ كل الرسالة")
+        self.نسخ_الكل=qt.QPushButton("نسخ كل الرسالة")
         self.نسخ_الكل.setDefault(True)
         self.نسخ_الكل.clicked.connect(self.copyAll)
-        self.نص_الرسالة = ""
-        self.إستماع = qt.QPushButton("الإستماع إلى الرسالة")
+        self.نص_الرسالة=""
+        self.إستماع=qt.QPushButton("الإستماع إلى الرسالة")
         self.إستماع.setDefault(True)
         self.إستماع.clicked.connect(self.listen)
         l=qt.QVBoxLayout()
@@ -60,7 +60,7 @@ class tab1(qt.QWidget):
         self.setLayout(l)
     def main(self):
         ask=self.الكتابة.text()
-        self.thread = Thread1(self.chat, ask)
+        self.thread=Thread1(self.chat, ask)
         self.thread.finished.connect(self.show_warning)
         self.thread.download_finished.connect(self.update_responses)
         self.thread.start()
@@ -94,9 +94,9 @@ class Thread2(qt2.QThread):
     download_finished=qt2.pyqtSignal(list)
     def __init__(self, model, ask1, image_path):
         super().__init__()
-        self.model = model
-        self.ask1 = ask1
-        self.image_path = image_path
+        self.model=model
+        self.ask1=ask1
+        self.image_path=image_path
     def run(self):
         model=genai.GenerativeModel('gemini-pro-vision')        
         try:
@@ -110,34 +110,34 @@ class Thread2(qt2.QThread):
 class tab2(qt.QWidget):
     def __init__(self):
         super().__init__()
-        self.model = genai.GenerativeModel('gemini-pro-vision')
+        self.model=genai.GenerativeModel('gemini-pro-vision')
         self.m=QMediaPlayer()
         self.w=QAudioOutput()
         self.m.setAudioOutput(self.w)
-        self.فتح = qt.QPushButton("إختيار سورة")
-        self.إظهار = qt.QLabel("إسأل سؤالا")
-        self.السؤال = qt.QLineEdit()
+        self.فتح=qt.QPushButton("إختيار سورة")
+        self.إظهار=qt.QLabel("إسأل سؤالا")
+        self.السؤال=qt.QLineEdit()
         self.السؤال.setAccessibleName("إسأل عن السورة")
         self.فتح.setDefault(True)
         self.فتح.clicked.connect(self.opinFile)
-        self.إرسال = qt.QPushButton("إرسال")
+        self.إرسال=qt.QPushButton("إرسال")
         self.إرسال.setDefault(True)
         self.إرسال.clicked.connect(self.main)
-        self.الردود = qt.QComboBox()
-        self.نسخ_الرد = qt.QPushButton("نسخ تلك الفقرة")
+        self.الردود=qt.QComboBox()
+        self.نسخ_الرد=qt.QPushButton("نسخ تلك الفقرة")
         self.نسخ_الرد.setDefault(True)
         self.نسخ_الرد.clicked.connect(self.copy)
-        self.نسخ_الكل = qt.QPushButton("نسخ كل الرسالة")
+        self.نسخ_الكل=qt.QPushButton("نسخ كل الرسالة")
         self.نسخ_الكل.setDefault(True)
         self.نسخ_الكل.clicked.connect(self.copyAll)
-        self.إستماع = qt.QPushButton("الإستماع إلى الرسالة")
+        self.إستماع=qt.QPushButton("الإستماع إلى الرسالة")
         self.إستماع.setDefault(True)
         self.إستماع.clicked.connect(self.listen)
-        self.إظهار1 = qt.QLabel("مسار الملف هو")
-        self.مسار = qt.QLineEdit()
+        self.إظهار1=qt.QLabel("مسار الملف هو")
+        self.مسار=qt.QLineEdit()
         self.مسار.setAccessibleName("مسار الملف هو")
         self.مسار.setReadOnly(True)
-        self.نص_الرسالة = ""
+        self.نص_الرسالة=""
         l=qt.QVBoxLayout()
         l.addWidget(self.إظهار1)
         l.addWidget(self.مسار)
@@ -183,7 +183,7 @@ class tab2(qt.QWidget):
         except:
             qt.QMessageBox.information(self, "عفوا", "لم يتم العثور على نص، إذا كان هناك نص قم بالتأكد من الإتصال بالإنترنت")
     def opinFile(self):
-        file_dialog = qt.QFileDialog()
+        file_dialog=qt.QFileDialog()
         file_dialog.setAcceptMode(qt.QFileDialog.AcceptMode.AcceptOpen)
         if file_dialog.exec() == qt.QFileDialog.DialogCode.Accepted:
             self.مسار.setText(file_dialog.selectedFiles()[0])
@@ -192,31 +192,31 @@ class SpeechThread(qt2.QThread):
     download_finished=qt2.pyqtSignal(str)
     def __init__(self, chat, lang):
         super().__init__()
-        self.chat = chat
-        self.lang = lang
+        self.chat=chat
+        self.lang=lang
     def run(self):
         SR=sr.Recognizer()
         with sr.Microphone() as src:
             winsound.PlaySound("data/1.wav", winsound.SND_FILENAME)
-            audio = SR.listen(src)
+            audio=SR.listen(src)
         try:
             winsound.PlaySound("data/2.wav", winsound.SND_FILENAME)
             text=SR.recognize_google(audio, language=self.lang)
         except Exception as e:
-            text = "sorry"
+            text="sorry"
             winsound.PlaySound("data/3.wav", winsound.SND_FILENAME)        
         try:
-            res = self.chat.send_message(text).text
+            res=self.chat.send_message(text).text
         except Exception as e:
-            res = "error"        
+            res="error"        
         try:
-            Language = langdetect.detect(res)
+            Language=langdetect.detect(res)
         except:
-            Language = "en"        
+            Language="en"        
         tts=gtts.gTTS(res, lang=Language)
-        tts.save("data/speak.mp3")
-        self.download_finished.emit("data/speak.mp3")
         winsound.PlaySound("data/4.wav", winsound.SND_FILENAME)
+        tts.save("data/speak.mp3")
+        self.download_finished.emit("data/speak.mp3")        
 class tab3(qt.QWidget):
     def __init__(self):
         super().__init__()
@@ -224,14 +224,14 @@ class tab3(qt.QWidget):
         self.m=QMediaPlayer()
         self.w=QAudioOutput()
         self.m.setAudioOutput(self.w)
-        self.إظهار = qt.QLabel("إختيار لغة التحدث مع الذكاء الإصطناعي")
-        self.اللغة = qt.QComboBox()
+        self.إظهار=qt.QLabel("إختيار لغة التحدث مع الذكاء الإصطناعي")
+        self.اللغة=qt.QComboBox()
         self.اللغة.setAccessibleName("إختيار لغة التحدث مع الذكاء الإصطناعي")
         self.اللغة.addItems(dic.languages.keys())
-        self.التحدث = qt.QPushButton("بدء التحدث")
+        self.التحدث=qt.QPushButton("بدء التحدث")
         self.التحدث.setDefault(True)
         self.التحدث.clicked.connect(self.OnSpeack)
-        self.إيقاف = qt.QPushButton("إيقاف المساعد")
+        self.إيقاف=qt.QPushButton("إيقاف المساعد")
         self.إيقاف.setDefault(True)
         self.إيقاف.clicked.connect(lambda: self.m.stop())
         l=qt.QVBoxLayout()
@@ -252,13 +252,13 @@ class tab3(qt.QWidget):
         self.m.setSource(qt2.QUrl.fromLocalFile(filepath))
         self.m.play()
 class ExtractTextThread(qt2.QThread):
-    text_extracted = qt2.pyqtSignal(str)
-    error_occurred = qt2.pyqtSignal(str)
+    text_extracted=qt2.pyqtSignal(str)
+    error_occurred=qt2.pyqtSignal(str)
     def __init__(self, file_path, language_index, custom_token):
         super().__init__()
-        self.file_path = file_path
-        self.language_index = language_index
-        self.custom_token = custom_token
+        self.file_path=file_path
+        self.language_index=language_index
+        self.custom_token=custom_token
     def run(self):
         recognizer=sr.Recognizer()
         with sr.AudioFile(self.file_path) as source:
@@ -281,33 +281,33 @@ class ExtractTextThread(qt2.QThread):
 class tab4(qt.QWidget):
     def __init__(self):
         super().__init__()
-        self.فتح = qt.QPushButton("فتح ملف wav")
+        self.فتح=qt.QPushButton("فتح ملف wav")
         self.فتح.setDefault(True)
         self.فتح.clicked.connect(self.opinFile)
-        self.إظهار1 = qt.QLabel("مسار الملف")
-        self.مسار = qt.QLineEdit()
+        self.إظهار1=qt.QLabel("مسار الملف")
+        self.مسار=qt.QLineEdit()
         self.مسار.setAccessibleName("مسار الملف")
         self.مسار.setReadOnly(True)
-        self.إظهار2 = qt.QLabel("إختيار لغة المقطع الصوتي")
-        self.اللغة = qt.QComboBox()
+        self.إظهار2=qt.QLabel("إختيار لغة المقطع الصوتي")
+        self.اللغة=qt.QComboBox()
         self.اللغة.setAccessibleName("إختيار لغة المقطع الصوتي")
         self.اللغة.addItem("الإنجليزية")
         self.اللغة.addItem("العربية")
         self.اللغة.addItem("تحديد لغة مخصصة")
-        self.إستخراج = qt.QPushButton("بدء الاستخراج")
+        self.إستخراج=qt.QPushButton("بدء الاستخراج")
         self.إستخراج.setDefault(True)
         self.إستخراج.clicked.connect(self.start_extraction)
-        self.إظهار3 = qt.QLabel("النص المستخرَج")
-        self.النص = qt.QLineEdit()
+        self.إظهار3=qt.QLabel("النص المستخرَج")
+        self.النص=qt.QLineEdit()
         self.النص.setAccessibleName("النص المستخرَج")
         self.النص.setReadOnly(True)
-        self.نسخ = qt.QPushButton("نسخ النص")
+        self.نسخ=qt.QPushButton("نسخ النص")
         self.نسخ.setDefault(True)
         self.نسخ.clicked.connect(self.copy_text)
-        self.إظهار4 = qt.QLabel("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
-        self.مخصص = qt.QLineEdit()
+        self.إظهار4=qt.QLabel("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
+        self.مخصص=qt.QLineEdit()
         self.مخصص.setAccessibleName("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
-        self.wit = qt.QPushButton("الذهاب الى موقع wit.ai")
+        self.wit=qt.QPushButton("الذهاب الى موقع wit.ai")
         self.wit.setDefault(True)
         self.wit.clicked.connect(self.open_wit_ai)
         self.wit.setDisabled(True)
@@ -383,25 +383,25 @@ class AudioExtractionThread(qt2.QThread):
 class tab5(qt.QWidget):
     def __init__(self):
         super().__init__()
-        self.فتح = qt.QPushButton("فتح ملف wav")
+        self.فتح=qt.QPushButton("فتح ملف wav")
         self.فتح.setDefault(True)
         self.فتح.clicked.connect(self.opinFile)
-        self.إظهار1 = qt.QLabel("مسار الملف")
-        self.مسار = qt.QLineEdit()
+        self.إظهار1=qt.QLabel("مسار الملف")
+        self.مسار=qt.QLineEdit()
         self.مسار.setAccessibleName("مسار الملف")
         self.مسار.setReadOnly(True)
-        self.إظهار2 = qt.QLabel("إختيار لغة المقطع الصوتي")
-        self.اللغة = qt.QComboBox()
+        self.إظهار2=qt.QLabel("إختيار لغة المقطع الصوتي")
+        self.اللغة=qt.QComboBox()
         self.اللغة.setAccessibleName("إختيار لغة المقطع الصوتي")
         self.اللغة.addItems(dic.languages.keys())
-        self.إستخراج = qt.QPushButton("بدء الاستخراج")
+        self.إستخراج=qt.QPushButton("بدء الاستخراج")
         self.إستخراج.setDefault(True)
         self.إستخراج.clicked.connect(self.start_extraction)
-        self.إظهار3 = qt.QLabel("النص المستخرَج")
-        self.النص = qt.QLineEdit()
+        self.إظهار3=qt.QLabel("النص المستخرَج")
+        self.النص=qt.QLineEdit()
         self.النص.setAccessibleName("النص المستخرَج")
         self.النص.setReadOnly(True)
-        self.نسخ = qt.QPushButton("نسخ النص")
+        self.نسخ=qt.QPushButton("نسخ النص")
         self.نسخ.setDefault(True)
         self.نسخ.clicked.connect(self.copy_text)        
         l=qt.QVBoxLayout()
@@ -436,7 +436,7 @@ class tab5(qt.QWidget):
         pyperclip.copy(self.النص.text())
         qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")
     def opinFile(self):
-        file_dialog = qt.QFileDialog()
+        file_dialog=qt.QFileDialog()
         file_dialog.setAcceptMode(qt.QFileDialog.AcceptMode.AcceptOpen)
         if file_dialog.exec() == qt.QFileDialog.DialogCode.Accepted:
             self.مسار.setText(file_dialog.selectedFiles()[0])
