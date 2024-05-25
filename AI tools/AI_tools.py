@@ -2,9 +2,11 @@ from PyQt6 import QtWidgets as qt
 from PyQt6 import QtGui as qt1
 from PyQt6 import QtCore as qt2
 from PyQt6.QtMultimedia import QMediaPlayer,QAudioOutput
-import gtts,os,langdetect,pyperclip,PIL.Image,about,dic,winsound,time,webbrowser
+from PIL import Image
+from io import BytesIO
 import speech_recognition as sr
 import google.generativeai as genai
+import gtts,os,langdetect,pyperclip,PIL.Image,about,dic,winsound,time,webbrowser,requests
 genai.configure(api_key="")
 model=genai.GenerativeModel('gemini-pro')
 response=model.start_chat()
@@ -440,10 +442,43 @@ class tab5(qt.QWidget):
         file_dialog.setAcceptMode(qt.QFileDialog.AcceptMode.AcceptOpen)
         if file_dialog.exec() == qt.QFileDialog.DialogCode.Accepted:
             self.مسار.setText(file_dialog.selectedFiles()[0])
+class tab6(qt.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.إظهار=qt.QLabel("أكتب وصفا دقيقا للصورة, الأفضل أن يكون بالإنجليزية")
+        self.الكتابة=qt.QLineEdit()
+        self.الكتابة.setAccessibleName("أكتب وصفا دقيقا للصورة, الأفضل أن يكون بالإنجليزية")
+        self.الحصول=qt.QPushButton("الحصول على صورة")
+        self.الحصول.setDefault(True)
+        self.الحصول.clicked.connect(self.git_image)
+        l=qt.QVBoxLayout()
+        l.addWidget(self.إظهار)
+        l.addWidget(self.الكتابة)
+        l.addWidget(self.الحصول)
+        self.setLayout(l)
+    def git_image(self):
+        if not self.الكتابة.text():
+            qt.QMessageBox.warning(self,"تنبيه","يرجى إدخال نص")
+            return
+        access_key= ""
+        query=self.الكتابة.text()
+        url=f"https://api.unsplash.com/photos/random?query={query}&client_id={access_key}"    
+        try:
+            response=requests.get(url)
+            if response.status_code == 200:
+                data=response.json()
+                image_url=data["urls"]["regular"]
+                image_response=requests.get(image_url)
+                img=Image.open(BytesIO(image_response.content))
+                img.show()
+            else:
+                qt.QMessageBox.warning(self, "خطأ", "حدث خطأ في جلب الصورة")
+        except Exception as e:
+            qt.QMessageBox.warning(self, "خطأ", f"حدث خطأ: {e}")
 class main (qt.QMainWindow):
     def __init__(self):
         super().__init__()        
-        self.setMinimumSize(1100,200)
+        self.setMinimumSize(1100,200)        
         self.setWindowTitle("أدوات الذكاء الإصتناعي")        
         self.التاب=qt.QTabWidget()
         self.التاب.setAccessibleName("الخيارات")
@@ -452,6 +487,7 @@ class main (qt.QMainWindow):
         self.التاب.addTab(tab3(),"إجراء محادثة صوتية مع الذكاء الإصتناعي")
         self.التاب.addTab(tab4(),"إستخرج النص من الصوتيات باستخدام wit.ai")
         self.التاب.addTab(tab5(),"إستخرج النص من الصوتيات باستخدام google")
+        self.التاب.addTab(tab6(),"توليد صور بالذكاء الإصتناعي")
         self.عن=qt.QPushButton("عن المطور")
         self.عن.setDefault(True)
         self.عن.clicked.connect(self.about)        
