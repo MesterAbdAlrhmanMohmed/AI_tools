@@ -8,7 +8,7 @@ from pydub import AudioSegment
 import speech_recognition as sr
 import google.generativeai as genai
 import gtts,os,langdetect,pyperclip,PIL.Image,about,dic,winsound,time,webbrowser,requests
-genai.configure(api_key="")
+genai.configure(api_key="AIzaSyCTr5HfWhL-79JEXsUMjbnRdSF97IVAic0")
 model=genai.GenerativeModel('gemini-pro')
 response=model.start_chat()
 if not os.path.exists("data_user"):
@@ -286,9 +286,9 @@ class ExtractTextThread(qt2.QThread):
                 audio_data=recognizer.record(source)
                 try:
                     if self.language_index == 0:
-                        text=recognizer.recognize_wit(audio_data, "")
+                        text=recognizer.recognize_wit(audio_data, "HRZPKOYNQBIPSWH62U7ODUBBOMOBD5XA")
                     elif self.language_index == 1:
-                        text=recognizer.recognize_wit(audio_data, "")
+                        text=recognizer.recognize_wit(audio_data, "CHAE4QCD5MFYJL6YV7IFYQ55IFXQ5UNQ")
                     elif self.language_index == 2:
                         if not self.custom_token:
                             self.error_occurred.emit("يرجى إدخال رمز اللغة المطلوب")
@@ -494,7 +494,7 @@ class tab6(qt.QWidget):
         if not self.الكتابة.text():
             qt.QMessageBox.warning(self,"تنبيه","يرجى إدخال نص")
             return
-        access_key=""
+        access_key="dk0ui1dO9odjGVHXlIH4q7CTA5Gom5aH_7hRshwcMk4"
         query=self.الكتابة.text()
         url=f"https://api.unsplash.com/photos/random?query={query}&client_id={access_key}"    
         try:
