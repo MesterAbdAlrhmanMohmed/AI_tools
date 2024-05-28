@@ -324,12 +324,9 @@ class tab4(qt.QWidget):
         self.إظهار3=qt.QLabel("النص المستخرَج")
         self.النص=qt.QComboBox()
         self.النص.setAccessibleName("النص المستخرَج")        
-        self.نسخ=qt.QPushButton("نسخ النص المحدد")
+        self.نسخ=qt.QPushButton("نسخ النص")
         self.نسخ.setDefault(True)
         self.نسخ.clicked.connect(self.copy_text)
-        self.نسخ_الكل=qt.QPushButton("نسخ كل النص")
-        self.نسخ_الكل.setDefault(True)
-        self.نسخ_الكل.clicked.connect(self.copyAll)
         self.إظهار4=qt.QLabel("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
         self.مخصص=qt.QLineEdit()
         self.مخصص.setAccessibleName("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
@@ -351,8 +348,7 @@ class tab4(qt.QWidget):
         l.addWidget(self.إستخراج)
         l.addWidget(self.إظهار3)
         l.addWidget(self.النص)
-        l.addWidget(self.نسخ)
-        l.addWidget(self.نسخ_الكل)
+        l.addWidget(self.نسخ)        
         self.setLayout(l)
     def open_wit_ai(self):
         webbrowser.open("https://wit.ai")
@@ -383,10 +379,7 @@ class tab4(qt.QWidget):
         qt.QMessageBox.warning(self, "تنبيه", message)
     def copy_text(self):
         pyperclip.copy(self.النص.currentText())
-        qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")
-    def copyAll(self):
-        pyperclip.copy(self.النص)
-        qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")
+        qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")    
     def opinFile(self):
         file_dialog = qt.QFileDialog()
         file_dialog.setAcceptMode(qt.QFileDialog.AcceptMode.AcceptOpen)
@@ -433,9 +426,6 @@ class tab5(qt.QWidget):
         self.نسخ=qt.QPushButton("نسخ النص المحدد")
         self.نسخ.setDefault(True)
         self.نسخ.clicked.connect(self.copy_text)
-        self.نسخ_الكل=qt.QPushButton("نسخ كل النص")
-        self.نسخ_الكل.setDefault(True)
-        self.نسخ_الكل.clicked.connect(self.copyAll)
         l=qt.QVBoxLayout()
         l.addWidget(self.فتح)
         l.addWidget(self.إظهار1)
@@ -445,8 +435,7 @@ class tab5(qt.QWidget):
         l.addWidget(self.إستخراج)
         l.addWidget(self.إظهار3)
         l.addWidget(self.النص)
-        l.addWidget(self.نسخ)
-        l.addWidget(self.نسخ_الكل)
+        l.addWidget(self.نسخ)        
         self.setLayout(l)
     def start_extraction(self):
         if not self.مسار.text().endswith(".wav"):
@@ -467,10 +456,7 @@ class tab5(qt.QWidget):
         qt.QMessageBox.warning(self, "تنبيه", message)
     def copy_text(self):
         pyperclip.copy(self.النص.currentText())
-        qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")
-    def copyAll(self):
-        pyperclip.copy(self.النص)
-        qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")
+        qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")    
     def opinFile(self):
         file_dialog=qt.QFileDialog()
         file_dialog.setAcceptMode(qt.QFileDialog.AcceptMode.AcceptOpen)
@@ -534,7 +520,7 @@ class main (qt.QMainWindow):
     def about(self):
         about.dialog(self).exec()            
 app=qt.QApplication([])
-app.setStyle('fusion')
+app.setStyle("fusion")
 w=main()
 w.show()
 app.exec()
