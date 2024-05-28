@@ -5,7 +5,7 @@ import webbrowser
 class dialog(qt.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setMinimumSize(1100,400)
+        self.setMinimumSize(1000,200)        
         self.setWindowTitle("عن المطور")
         self.القائمة=qt.QListWidget()
         self.القائمة.clicked.connect(self.about)

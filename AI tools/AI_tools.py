@@ -4,14 +4,15 @@ from PyQt6 import QtCore as qt2
 from PyQt6.QtMultimedia import QMediaPlayer,QAudioOutput
 from PIL import Image
 from io import BytesIO
+from pydub import AudioSegment
 import speech_recognition as sr
 import google.generativeai as genai
 import gtts,os,langdetect,pyperclip,PIL.Image,about,dic,winsound,time,webbrowser,requests
 genai.configure(api_key="")
 model=genai.GenerativeModel('gemini-pro')
 response=model.start_chat()
-if not os.path.exists("data"):
-    os.makedirs("data")
+if not os.path.exists("data_user"):
+    os.makedirs("data_user")
 class Thread1(qt2.QThread):
     finished=qt2.pyqtSignal(str)
     download_finished=qt2.pyqtSignal(list)
@@ -81,13 +82,13 @@ class tab1(qt.QWidget):
         try:
             lang=langdetect.detect(self.نص_الرسالة)
             result=gtts.gTTS(self.نص_الرسالة, lang=lang)
-            result.save("data/message.mp3")
+            result.save("data_user/message.mp3")
             if self.m.isPlaying():
                 self.إستماع.setText("الاستماع إلى الرسالة")
                 self.m.stop()
             else:
                 self.إستماع.setText("إيقاف")
-                self.m.setSource(qt2.QUrl.fromLocalFile("data/message.mp3"))
+                self.m.setSource(qt2.QUrl.fromLocalFile("data_user/message.mp3"))
                 self.m.play()
         except:
             qt.QMessageBox.information(self, "عفوا", "لم يتم العثور على نص، إذا كان هناك نص قم بالتأكد من الإتصال بالإنترنت")
@@ -174,13 +175,13 @@ class tab2(qt.QWidget):
         try:
             lang=langdetect.detect(self.نص_الرسالة)
             result=gtts.gTTS(self.نص_الرسالة, lang=lang)
-            result.save("data/message.mp3")
+            result.save("data_user/message.mp3")
             if self.m.isPlaying():
                 self.إستماع.setText("الإستماع إلى الرسالة")
                 self.m.stop()
             else:
                 self.إستماع.setText("إيقاف")
-                self.m.setSource(qt2.QUrl.fromLocalFile("data/message.mp3"))
+                self.m.setSource(qt2.QUrl.fromLocalFile("data_user/message.mp3"))
                 self.m.play()
         except:
             qt.QMessageBox.information(self, "عفوا", "لم يتم العثور على نص، إذا كان هناك نص قم بالتأكد من الإتصال بالإنترنت")
@@ -217,8 +218,8 @@ class SpeechThread(qt2.QThread):
             Language="en"        
         tts=gtts.gTTS(res, lang=Language)
         winsound.PlaySound("data/4.wav", winsound.SND_FILENAME)
-        tts.save("data/speak.mp3")
-        self.download_finished.emit("data/speak.mp3")        
+        tts.save("data_user/speak.mp3")
+        self.download_finished.emit("data_user/speak.mp3")        
 class tab3(qt.QWidget):
     def __init__(self):
         super().__init__()
@@ -256,30 +257,51 @@ class tab3(qt.QWidget):
 class ExtractTextThread(qt2.QThread):
     text_extracted=qt2.pyqtSignal(str)
     error_occurred=qt2.pyqtSignal(str)
+    max_file_size_mb=10
     def __init__(self, file_path, language_index, custom_token):
         super().__init__()
         self.file_path=file_path
         self.language_index=language_index
         self.custom_token=custom_token
     def run(self):
+        file_size_mb=os.path.getsize(self.file_path) / (1024 * 1024)
+        if file_size_mb > self.max_file_size_mb:
+            self.error_occurred.emit(f"حجم الملف كبير جداً ({file_size_mb:.2f} ميجابايت). الحد الأقصى المسموح به هو {self.max_file_size_mb} ميجابايت.")
+            return
         recognizer=sr.Recognizer()
-        with sr.AudioFile(self.file_path) as source:
-            audio_data=recognizer.record(source)
-            try:
-                if self.language_index == 0:
-                    text=recognizer.recognize_wit(audio_data, "")
-                elif self.language_index == 1:
-                    text=recognizer.recognize_wit(audio_data, "")
-                elif self.language_index == 2:
-                    if not self.custom_token:
-                        self.error_occurred.emit("يرجى إدخال رمز اللغة المطلوب")
-                        return
-                    text=recognizer.recognize_wit(audio_data, self.custom_token)
-                self.text_extracted.emit(text)                
-            except sr.UnknownValueError:
-                self.error_occurred.emit("حدث خطأ، ربما المقطع فارغ أو اللغة غير صحيحة أو لم يتم التعرف بشكل جيد على المقطع")
-            except sr.RequestError:
-                self.error_occurred.emit("فشلت عملية استخراج النص، ربما امتداد الملف غير مدعوم أو هناك مشكلة في الإنترنت")
+        try:
+            audio=AudioSegment.from_file(self.file_path)
+        except Exception as e:
+            self.error_occurred.emit(f"فشل في قراءة الملف: {e}")
+            return
+        duration=len(audio)
+        segment_duration=10*1000
+        num_segments=duration // segment_duration
+        all_text=[]
+        for i in range(num_segments + 1):
+            start_time=i * segment_duration
+            end_time=min((i + 1) * segment_duration, duration)
+            segment=audio[start_time:end_time]
+            with sr.AudioFile(segment.export(format="wav")) as source:
+                audio_data=recognizer.record(source)
+                try:
+                    if self.language_index == 0:
+                        text=recognizer.recognize_wit(audio_data, "")
+                    elif self.language_index == 1:
+                        text=recognizer.recognize_wit(audio_data, "")
+                    elif self.language_index == 2:
+                        if not self.custom_token:
+                            self.error_occurred.emit("يرجى إدخال رمز اللغة المطلوب")
+                            return
+                        text=recognizer.recognize_wit(audio_data, self.custom_token)
+                    all_text.append(text)
+                except sr.UnknownValueError:
+                    all_text.append("لم يتم التعرف على النص في هذا المقطع, أو إنتها المقطع")
+                except sr.RequestError as e:
+                    self.error_occurred.emit(f"فشلت عملية استخراج النص: {e}")
+                    return
+        full_text="\n".join(all_text)
+        self.text_extracted.emit(full_text)
 class tab4(qt.QWidget):
     def __init__(self):
         super().__init__()
@@ -300,12 +322,14 @@ class tab4(qt.QWidget):
         self.إستخراج.setDefault(True)
         self.إستخراج.clicked.connect(self.start_extraction)
         self.إظهار3=qt.QLabel("النص المستخرَج")
-        self.النص=qt.QLineEdit()
-        self.النص.setAccessibleName("النص المستخرَج")
-        self.النص.setReadOnly(True)
-        self.نسخ=qt.QPushButton("نسخ النص")
+        self.النص=qt.QComboBox()
+        self.النص.setAccessibleName("النص المستخرَج")        
+        self.نسخ=qt.QPushButton("نسخ النص المحدد")
         self.نسخ.setDefault(True)
         self.نسخ.clicked.connect(self.copy_text)
+        self.نسخ_الكل=qt.QPushButton("نسخ كل النص")
+        self.نسخ_الكل.setDefault(True)
+        self.نسخ_الكل.clicked.connect(self.copyAll)
         self.إظهار4=qt.QLabel("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
         self.مخصص=qt.QLineEdit()
         self.مخصص.setAccessibleName("إدخال الرمز المميز Client Access Token للغة من موقع wit.ai")
@@ -328,6 +352,7 @@ class tab4(qt.QWidget):
         l.addWidget(self.إظهار3)
         l.addWidget(self.النص)
         l.addWidget(self.نسخ)
+        l.addWidget(self.نسخ_الكل)
         self.setLayout(l)
     def open_wit_ai(self):
         webbrowser.open("https://wit.ai")
@@ -353,11 +378,14 @@ class tab4(qt.QWidget):
         self.thread.error_occurred.connect(self.show_error_message)
         self.thread.start()
     def show_extracted_text(self, text):
-        self.النص.setText(text)        
+        self.النص.addItem(str(text))
     def show_error_message(self, message):
         qt.QMessageBox.warning(self, "تنبيه", message)
     def copy_text(self):
-        pyperclip.copy(self.النص.text())
+        pyperclip.copy(self.النص.currentText())
+        qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")
+    def copyAll(self):
+        pyperclip.copy(self.النص)
         qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")
     def opinFile(self):
         file_dialog = qt.QFileDialog()
@@ -400,12 +428,14 @@ class tab5(qt.QWidget):
         self.إستخراج.setDefault(True)
         self.إستخراج.clicked.connect(self.start_extraction)
         self.إظهار3=qt.QLabel("النص المستخرَج")
-        self.النص=qt.QLineEdit()
-        self.النص.setAccessibleName("النص المستخرَج")
-        self.النص.setReadOnly(True)
-        self.نسخ=qt.QPushButton("نسخ النص")
+        self.النص=qt.QComboBox()
+        self.النص.setAccessibleName("النص المستخرَج")        
+        self.نسخ=qt.QPushButton("نسخ النص المحدد")
         self.نسخ.setDefault(True)
-        self.نسخ.clicked.connect(self.copy_text)        
+        self.نسخ.clicked.connect(self.copy_text)
+        self.نسخ_الكل=qt.QPushButton("نسخ كل النص")
+        self.نسخ_الكل.setDefault(True)
+        self.نسخ_الكل.clicked.connect(self.copyAll)
         l=qt.QVBoxLayout()
         l.addWidget(self.فتح)
         l.addWidget(self.إظهار1)
@@ -416,6 +446,7 @@ class tab5(qt.QWidget):
         l.addWidget(self.إظهار3)
         l.addWidget(self.النص)
         l.addWidget(self.نسخ)
+        l.addWidget(self.نسخ_الكل)
         self.setLayout(l)
     def start_extraction(self):
         if not self.مسار.text().endswith(".wav"):
@@ -431,11 +462,14 @@ class tab5(qt.QWidget):
         self.thread.error_occurred.connect(self.show_error_message)
         self.thread.start()
     def show_extracted_text(self, text):
-        self.النص.setText(text)        
+        self.النص.addItem(str(text))
     def show_error_message(self, message):
         qt.QMessageBox.warning(self, "تنبيه", message)
     def copy_text(self):
-        pyperclip.copy(self.النص.text())
+        pyperclip.copy(self.النص.currentText())
+        qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")
+    def copyAll(self):
+        pyperclip.copy(self.النص)
         qt.QMessageBox.information(self, "تنبيه", "تم نسخ النص إلى الحافظة")
     def opinFile(self):
         file_dialog=qt.QFileDialog()
@@ -460,7 +494,7 @@ class tab6(qt.QWidget):
         if not self.الكتابة.text():
             qt.QMessageBox.warning(self,"تنبيه","يرجى إدخال نص")
             return
-        access_key= ""
+        access_key=""
         query=self.الكتابة.text()
         url=f"https://api.unsplash.com/photos/random?query={query}&client_id={access_key}"    
         try:
@@ -478,7 +512,7 @@ class tab6(qt.QWidget):
 class main (qt.QMainWindow):
     def __init__(self):
         super().__init__()        
-        self.setMinimumSize(1100,200)        
+        self.setMinimumSize(1000,200)        
         self.setWindowTitle("أدوات الذكاء الإصتناعي")        
         self.التاب=qt.QTabWidget()
         self.التاب.setAccessibleName("الخيارات")
